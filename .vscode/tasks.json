@@ -1,0 +1,67 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "project build",
+      "command": "g++",
+      "args": [
+        "main.cpp",
+        "source/*.cpp",
+        "-I",
+        "/usr/local/include/igraph/",
+        "-L",
+        "/usr/lib/libigraph.a",
+        "-ligraph",
+        "-o",
+        "compile/main.out",
+        "-lrt",
+        "-lm",
+        "-g",
+        "-static-libgcc",
+        "-std=c++17"
+      ],
+      "type": "shell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "project test",
+      "command": "g++",
+      "args": [
+        "maintest.cpp",
+        "source/*.cpp",
+        "-o",
+        "compile/main.out",
+        "-lgtest",
+        "-lgtest_main",
+        "-lpthread",
+        "-g",
+        "-static-libgcc",
+        "-std=c++17"
+      ],
+      "type": "shell",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": "$gcc"
+    }
+  ]
+}
