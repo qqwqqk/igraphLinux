@@ -40,7 +40,8 @@
       "command": "g++",
       "args": [
         "maintest.cpp",
-        "source/*.cpp",
+        "source/dataprocessing.cpp",
+        "source/nmi.cpp",
         "-o",
         "compile/main.out",
         "-lgtest",
