@@ -1,23 +1,21 @@
-#include <stdio.h>
-#include <igraph.h>
-#include <string.h>
+#include "../header/method.h"
 
 #define WALKTRAP_STEPS 0x4
 
 int walktrap(const char* path)
 {
-	char readheader[200] = "sourcedata/Edgelist_";
-	char writeheader[200] = "targetdata/Walktrap_";
-	strcat_s(readheader, 200, path);
-	strcat_s(writeheader, 200, path);
+  char readheader[200] = "dataset/netdata/";
+	char writeheader[200] = "dataset/labeldata/Walktrap_";
+	strcat(readheader, path);
+	strcat(writeheader, path);
 
 	const char* readpath = readheader;
 	const char* writepath = writeheader;
 
-	//±ß´æ·ÅµÄÎÄ¼ş,¿Õ¸ñ·Ö¸ô
+	//è¾¹å­˜æ”¾çš„æ–‡ä»¶,ç©ºæ ¼åˆ†éš”
 	FILE *edgeListFile, *ResultFile;
-	fopen_s(&edgeListFile, readpath, "r");
-	fopen_s(&ResultFile, writepath, "w");
+	edgeListFile = fopen(readpath, "r");
+	ResultFile = fopen(writepath, "w");
 
 	igraph_t wbNetwork;
 	igraph_real_t Q_value;
@@ -34,7 +32,7 @@ int walktrap(const char* path)
 	/* turn on attribute handling */
 	igraph_i_set_attribute_table(&igraph_cattribute_table);
 
-	//³õÊ¼»¯¶ÔÏó
+	//åˆå§‹åŒ–å¯¹è±¡
 	igraph_vector_init(&modularity, 0);
 	igraph_vector_init(&membership, 0);
 	igraph_matrix_init(&merges, 0, 0);
@@ -42,13 +40,13 @@ int walktrap(const char* path)
 
 	//if (argc < 2){printf("Usage: %s <inputRelationFile> \n", argv[0]);exit(1);}
 
-	//´ÓÎÄ¼şÖĞ¶ÁÈëÍ¼
+	//ä»æ–‡ä»¶ä¸­è¯»å…¥å›¾
 	igraph_read_graph_ncol(&wbNetwork,
 		edgeListFile,
-		0,  /*Ô¤¶¨ÒåµÄ½ÚµãÃû³Æ*/
-		1, /*¶ÁÈë½ÚµãÃû³Æ*/
-		IGRAPH_ADD_WEIGHTS_NO,  /*ÊÇ·ñ½«±ßµÄÈ¨ÖØÒ²¶ÁÈë*/
-		0  /*0±íÊ¾ÎŞÏòÍ¼*/
+		0,  /*é¢„å®šä¹‰çš„èŠ‚ç‚¹åç§°*/
+		1, /*è¯»å…¥èŠ‚ç‚¹åç§°*/
+		IGRAPH_ADD_WEIGHTS_NO,  /*æ˜¯å¦å°†è¾¹çš„æƒé‡ä¹Ÿè¯»å…¥*/
+		0  /*0è¡¨ç¤ºæ— å‘å›¾*/
 		);
 	fclose(edgeListFile);
 	igraph_simplify(&wbNetwork, 1, 1, 0);
@@ -65,11 +63,11 @@ int walktrap(const char* path)
 
 	no_of_nodes = igraph_vcount(&wbNetwork);
 	no_of_edges = igraph_ecount(&wbNetwork);
-	printf("Graph node numbers: %d \n", no_of_nodes);
-	printf("Graph edge numbers: %d \n", no_of_edges);
+	printf("Graph node numbers: %d \n", (int)no_of_nodes);
+	printf("Graph edge numbers: %d \n", (int)no_of_edges);
 
 
-	//´òÓ¡¼ÆËãÓÃIDÓë½ÚµãIDµÄ¶ÔÓ¦¹ı³Ì
+	//æ‰“å°è®¡ç®—ç”¨IDä¸èŠ‚ç‚¹IDçš„å¯¹åº”è¿‡ç¨‹
 	/*
 	if (igraph_cattribute_has_attr(&wbNetwork, IGRAPH_ATTRIBUTE_VERTEX, "name")){
 	printf("Vertex names: ");
@@ -82,13 +80,13 @@ int walktrap(const char* path)
 	}
 	*/
 
-	//ÓÃËæ»úÓÎ×ßËã·¨¶ÔÍøÂç½øĞĞÉçÇø½á¹¹»®·Ö
+	//ç”¨éšæœºæ¸¸èµ°ç®—æ³•å¯¹ç½‘ç»œè¿›è¡Œç¤¾åŒºç»“æ„åˆ’åˆ†
 	rstCode = igraph_community_walktrap(&wbNetwork,
 		/*edge weights*/ 0,
-		WALKTRAP_STEPS,  /*Ëæ»úÓÎ×ßµÄ²½Êı*/
+		WALKTRAP_STEPS,  /*éšæœºæ¸¸èµ°çš„æ­¥æ•°*/
 		&merges,
 		&modularity,
-		&membership  /*Ã¿¸ö½Úµã´ÓÊôµÄcommunity±àºÅ*/);
+		&membership  /*æ¯ä¸ªèŠ‚ç‚¹ä»å±çš„communityç¼–å·*/);
 	if (rstCode != 0){
 		printf("Error dealing with finding communities");
 		return 1;
@@ -97,7 +95,7 @@ int walktrap(const char* path)
 		printf("Finding communities success! \n");
 	}
 
-	//´òÓ¡³öÄ£¿é¶ÈÑİ±äµÄ¹ı³Ì
+	//æ‰“å°å‡ºæ¨¡å—åº¦æ¼”å˜çš„è¿‡ç¨‹
 	/*
 	printf("Merges:\n");
 	for (i = 0; i<igraph_matrix_nrow(&merges); i++) {
@@ -118,11 +116,11 @@ int walktrap(const char* path)
 	fclose(ResultFile);
 
 	rstCode = igraph_modularity(&wbNetwork,
-		/* ³ÉÔ±¹ØÏµ */&membership,
-		/* Ä£¿é¶È */&Q_value,
-		/* ÍøÂçÈ¨ÖØ */NULL);
+		/* æˆå‘˜å…³ç³» */&membership,
+		/* æ¨¡å—åº¦ */&Q_value,
+		/* ç½‘ç»œæƒé‡ */NULL);
 
-	printf("community number£º%d \t modularity:%g \n", count + 1, Q_value);
+	printf("community numberï¼š%d \t modularity:%g \n", count + 1, Q_value);
 
 	igraph_vector_destroy(&modularity);
 	igraph_vector_destroy(&membership);

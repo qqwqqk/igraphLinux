@@ -1,23 +1,21 @@
-#include <stdio.h>
-#include <igraph.h>
-#include <string.h>
+#include "../header/method.h"
 
 #define INFOMAP_TRIALS 0x4
 
 int infomap(const char* path)
 {
-	char readheader[200] = "sourcedata/Edgelist_";
-	char writeheader[200] = "targetdata/Informap_";
-	strcat_s(readheader, 200, path);
-	strcat_s(writeheader, 200, path);
+  char readheader[200] = "dataset/netdata/";
+	char writeheader[200] = "dataset/labeldata/Informap_";
+	strcat(readheader, path);
+	strcat(writeheader, path);
 
 	const char* readpath = readheader;
 	const char* writepath = writeheader;
 
-	//�ߴ�ŵ��ļ�,�ո�ָ�
+	//边存放的文件,空格分隔
 	FILE *edgeListFile, *ResultFile;
-	fopen_s(&edgeListFile, readpath, "r");
-	fopen_s(&ResultFile, writepath, "w");
+	edgeListFile = fopen(readpath, "r");
+	ResultFile = fopen(writepath, "w");
 
 	igraph_t wbNetwork;
 	igraph_real_t Q_value;
@@ -32,18 +30,18 @@ int infomap(const char* path)
 	/* turn on attribute handling */
 	igraph_i_set_attribute_table(&igraph_cattribute_table);
 
-	//��ʼ������
+	//初始化对象
 	igraph_vector_init(&membership, 0);
 
 	//if (argc < 2){printf("Usage: %s <inputRelationFile> \n", argv[0]);exit(1);}
 
-	//���ļ��ж���ͼ
+	//从文件中读入图
 	igraph_read_graph_ncol(&wbNetwork,
 		edgeListFile,
-		0,  /*Ԥ����Ľڵ�����*/
-		1, /*����ڵ�����*/
-		IGRAPH_ADD_WEIGHTS_NO,  /*�Ƿ񽫱ߵ�Ȩ��Ҳ����*/
-		0  /*0��ʾ����ͼ*/
+		0,  /*预定义的节点名称*/
+		1, /*读入节点名称*/
+		IGRAPH_ADD_WEIGHTS_NO,  /*是否将边的权重也读入*/
+		0  /*0表示无向图*/
 		);
 	fclose(edgeListFile);
 	igraph_simplify(&wbNetwork, 1, 1, 0);
@@ -60,11 +58,11 @@ int infomap(const char* path)
 
 	no_of_nodes = igraph_vcount(&wbNetwork);
 	no_of_edges = igraph_ecount(&wbNetwork);
-	printf("Graph node numbers: %d \n", no_of_nodes);
-	printf("Graph edge numbers: %d \n", no_of_edges);
+	printf("Graph node numbers: %d \n", (int)no_of_nodes);
+	printf("Graph edge numbers: %d \n", (int)no_of_edges);
 
 
-	//��ӡ������ID��ڵ�ID�Ķ�Ӧ����
+	//打印计算用ID与节点ID的对应过程
 	/*
 	if (igraph_cattribute_has_attr(&wbNetwork, IGRAPH_ATTRIBUTE_VERTEX, "name")){
 	printf("Vertex names: ");
@@ -77,12 +75,12 @@ int infomap(const char* path)
 	}
 	*/
 
-	//����������㷨��������������ṹ����
+	//用随机游走算法对网络进行社区结构划分
 	rstCode = igraph_community_infomap(&wbNetwork,
 		/*edge weights*/ 0, 0,
-		INFOMAP_TRIALS,  /*������ߵĲ���*/
+		INFOMAP_TRIALS,  /*随机游走的步数*/
 		&membership,
-		&codelength/*ÿ���ڵ������community���*/);
+		&codelength/*每个节点从属的community编号*/);
 	if (rstCode != 0){
 		printf("Error dealing with finding communities");
 		return 1;
@@ -91,7 +89,7 @@ int infomap(const char* path)
 		printf("Finding communities success! \n");
 	}
 
-	//��ӡ��ģ����ݱ�Ĺ���
+	//打印出模块度演变的过程
 	/*
 	printf("Merges:\n");
 	for (i = 0; i<igraph_matrix_nrow(&merges); i++) {
@@ -113,11 +111,11 @@ int infomap(const char* path)
 	fclose(ResultFile);
 
 	rstCode = igraph_modularity(&wbNetwork,
-		/* ��Ա��ϵ */&membership,
-		/* ģ��� */&Q_value,
-		/* ����Ȩ�� */NULL);
+		/* 成员关系 */&membership,
+		/* 模块度 */&Q_value,
+		/* 网络权重 */NULL);
 
-	printf("community number��%d \t modularity:%g \n", count + 1, Q_value);
+	printf("community number：%d \t modularity:%g \n", count + 1, Q_value);
 
 	igraph_vector_destroy(&membership);
 

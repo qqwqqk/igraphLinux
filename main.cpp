@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "infomap.h"
-#include "labelpropagation.h"
-#include "walktrap.h"
+#include "header/method.h"
 
 #define INFOMAP 0x1
 #define LPA 0x2
@@ -11,33 +9,32 @@
 int main(){
 	char splite[100];
 	int mothed = WALKTRAP;
+	char name[80] = "Fakedata_20_30_50_800_96_E10000";
 
-	const char* name = "MC";
-	const char* intercept = "E"; 
-	const int number = 10000;
-	const char* nodetype = "A";
+  printf("please input mothed code and file name: \n");
+  scanf("%d %s", &mothed, name);
 
-	sprintf_s(splite, 100, "%s_%s_%s%d.txt", name, nodetype, intercept, number);
+	sprintf(splite,"%s.txt", name);
 	const char* path = splite;
 
 	switch (mothed)
 	{
 	case INFOMAP:
-		infomap(path);
 		printf("results obtained by method infomap \n");
+		infomap(path);
 		break;
 	case LPA:
-		labelpropagation(path);
 		printf("results obtained by mothed labelpropagation \n");
+		labelpropagation(path);
 		break;
 	case WALKTRAP:
-		walktrap(path);
 		printf("results obtained by mothed walktrap \n");
+		walktrap(path);
 		break;
 	default:
-		printf("未定义的方法\n");
+		printf("input error!\n");
 		exit(0);
 	}
 
-	system("pause");
+  return 0;
 }
