@@ -9,12 +9,12 @@
 int main(){
 	char splite[100];
 	int mothed = WALKTRAP;
-	char name[80] = "Fakedata_20_30_50_800_96_E10000";
+	char name[80] = "Fakedata_1000_500_10_100_10";
 
   printf("please input mothed code and file name: \n");
   scanf("%d %s", &mothed, name);
 
-	sprintf(splite,"%s.txt", name);
+	sprintf(splite,"%s_SingleA_E10000.txt", name);
 	const char* path = splite;
 
 	switch (mothed)
