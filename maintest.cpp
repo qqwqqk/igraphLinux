@@ -17,7 +17,7 @@ int main(){
 
   const string split = "_";
   const string str = to_string(nodenum) + split + to_string(edgenum) + split + to_string(setmin) +split + to_string(setmax) + split + to_string(probability);
-  const string resultpath = "dataset/labeldata/LabelPropagation_Fakedata_" + str + "_E10000.txt";
+  const string resultpath = "dataset/labeldata/Walktrap_Fakedata_" + str + "_SingleA_E10000.txt";
   const string tagpath = "dataset/tagdata/Fakedata_tag_" + str + ".txt";
 
   vector<vector<int>> x = getCommunityResult(resultpath);
